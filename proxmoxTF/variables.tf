@@ -1,11 +1,14 @@
 variable "api_token" {
-  type    = string
-  ephemeral = true
+  type      = string
   sensitive = true
-} 
+}
 
 variable "password" {
-  type = string
-  ephemeral = true
+  type      = string
+  sensitive = true
+}
+
+variable "private_key" {
+  type      = string
   sensitive = true
 }
