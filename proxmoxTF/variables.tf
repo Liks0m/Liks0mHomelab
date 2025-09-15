@@ -1,4 +1,8 @@
-variable "api_token" {
+variable "api_token_user" {
+  type      = string
+  sensitive = true
+}
+variable "api_token_sercet" {
   type      = string
   sensitive = true
 }
@@ -8,7 +12,3 @@ variable "password" {
   sensitive = true
 }
 
-variable "private_key" {
-  type      = string
-  sensitive = true
-}

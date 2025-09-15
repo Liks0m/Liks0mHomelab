@@ -1,1 +1,9 @@
-terraform.tfvars
+## macOS ##
+*.DS_Store
+
+### Terraform ###
+**/.terraform/*
+**/.terraform.lock.hcl
+*.tfstate
+*.tfstate.*
+*.tfvars

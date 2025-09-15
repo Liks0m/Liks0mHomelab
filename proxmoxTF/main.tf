@@ -8,35 +8,65 @@ terraform {
 }
 
 provider "proxmox" {
-  endpoint  = "https://100.124.250.20:8006/api2/json"
-  api_token = var.api_token
-  insecure  = true
-  ssh {
-    agent       = false
-    username    = "Liks0m"
-    private_key = var.private_key
-  }
+  pm_api_url          = "https://100.124.250.20:8006/api2/json"
+  pm_api_token_secret = var.api_token_sercet
+  pm_api_token_id     = var.api_token_user
+  pm_tls_insecure     = true
+  pm_debug            = true
 }
 
 
-resource "proxmox_virtual_environment_vm" "AlmaLinux_vm" {
-  name      = "test-AlmaLinux"
-  node_name = "Liks0mHomelab"
-  vm_id     = 100
-  initialization {
-    user_account {
-      username = "Liks0m"
-      password = var.password
+resource "proxmox_vm_qemu" "Alma01" {
+  vmid        = 100
+  name        = "test-terraform0"
+  target_node = "Liks0mHomelab"
+  agent       = 1
+  cpu { cores = 2 }
+  memory           = 2048
+  boot             = "order=scsi0"           # has to be the same as the OS disk of the template
+  clone            = "AlmaLinux10-CloudInit" # The name of the template
+  scsihw           = "virtio-scsi-single"
+  vm_state         = "running"
+  automatic_reboot = true
+
+  # Cloud-Init configuration
+  cicustom   = "vendor=local:snippets/qemu-guest-agent.yml" # /var/lib/vz/snippets/qemu-guest-agent.yml
+  ciupgrade  = true
+  nameserver = "1.1.1.1 8.8.8.8"
+  ipconfig0  = "ip=192.168.1.10/24,gw=192.168.1.1,ip6=dhcp"
+  skip_ipv6  = true
+  ciuser     = "root"
+  cipassword = var.password
+  # Most cloud-init images require a serial device for their display
+  serial {
+    id = 0
+  }
+
+  disks {
+    scsi {
+      scsi0 {
+        # We have to specify the disk from our template, else Terraform will think it's not supposed to be there
+        disk {
+          storage = "local-lvm"
+          # The size of the disk should be at least as big as the disk in the template. If it's smaller, the disk will be recreated
+          size = "20G"
+        }
+      }
+    }
+    ide {
+      # Some images require a cloud-init disk on the IDE controller, others on the SCSI or SATA controller
+      ide1 {
+        cloudinit {
+          storage = "local-lvm"
+        }
+      }
     }
   }
 
-  disk {
-    datastore_id = "local-lvm"
-    file_id      = "local:iso/AlmaLinux-10.0-x86_64-boot.iso"
-    interface    = "virtio0"
-    iothread     = true
-    discard      = "on"
-    size         = 200
+  network {
+    id     = 0
+    bridge = "vmbr0"
+    model  = "virtio"
   }
 }
 
