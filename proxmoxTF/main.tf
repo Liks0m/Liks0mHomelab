@@ -30,7 +30,8 @@ resource "proxmox_vm_qemu" "Alma01" {
   automatic_reboot = true
 
   # Cloud-Init configuration
-  cicustom   = "vendor=local:snippets/qemu-guest-agent.yml" # /var/lib/vz/snippets/qemu-guest-agent.yml
+  cicustom = "vendor=local:snippets/qemu-guest-agent.yml" # /var/lib/vz/snippets/qemu-guest-agent.yml
+  #cloud-config
   ciupgrade  = true
   nameserver = "1.1.1.1 8.8.8.8"
   ipconfig0  = "ip=192.168.1.10/24,gw=192.168.1.1,ip6=dhcp"
