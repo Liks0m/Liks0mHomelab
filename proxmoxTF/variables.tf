@@ -12,3 +12,7 @@ variable "password" {
   sensitive = true
 }
 
+variable "pubkey" {
+  type      = string
+  sensitive = true
+}

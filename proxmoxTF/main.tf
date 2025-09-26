@@ -37,6 +37,7 @@ resource "proxmox_vm_qemu" "Alma01" {
   skip_ipv6  = true
   ciuser     = "root"
   cipassword = var.password
+  sshkeys    = var.pubkey
   # Most cloud-init images require a serial device for their display
   serial {
     id = 0
